@@ -61,4 +61,16 @@ class TestCase extends Laravel\Lumen\Testing\TestCase
             call_user_func([$model, 'boot']);
         }
     }
+
+    /**
+     * Start a session and attach the CSRF token to the attributes.
+     *
+     * @return array
+     */
+    protected function csrf(array $attributes = [])
+    {
+        $this->startSession();
+
+        return $attributes + ['_token' => csrf_token()];
+    }
 }
