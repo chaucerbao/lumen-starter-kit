@@ -21,13 +21,13 @@ class UserTest extends TestCase
     {
         $user = FactoryMuffin::instance('App\User', [
             'email' => 'a@b.cd',
-            'password' => 'aTestPassword',
+            'password' => 'secret',
         ]);
 
         $user->save();
 
-        $this->assertNotEquals('aTestPassword', $user->password);
-        $this->assertTrue(Auth::validate(['email' => 'a@b.cd', 'password' => 'aTestPassword']));
+        $this->assertNotEquals('secret', $user->password);
+        $this->assertTrue(Auth::validate(['email' => 'a@b.cd', 'password' => 'secret']));
     }
 
     /**
@@ -37,7 +37,7 @@ class UserTest extends TestCase
     {
         $user = FactoryMuffin::create('App\User', [
             'email' => 'a@b.cd',
-            'password' => 'aTestPassword',
+            'password' => 'secret',
         ]);
         $hashed_password = $user->password;
 
@@ -46,6 +46,24 @@ class UserTest extends TestCase
         $user->save();
 
         $this->assertEquals($hashed_password, $user->password);
-        $this->assertTrue(Auth::validate(['email' => 'a@b.cd', 'password' => 'aTestPassword']));
+        $this->assertTrue(Auth::validate(['email' => 'a@b.cd', 'password' => 'secret']));
+    }
+
+    /**
+     * Test that a hashed password is not re-hashed when empty during save.
+     */
+    public function testHashedPasswordNotRehashedWhenEmptyDuringSave()
+    {
+        $user = FactoryMuffin::create('App\User', [
+            'email' => 'a@b.cd',
+            'password' => 'secret',
+        ]);
+        $hashed_password = $user->password;
+
+        $user->password = '';
+        $user->save();
+
+        $this->assertEquals($hashed_password, $user->password);
+        $this->assertTrue(Auth::validate(['email' => 'a@b.cd', 'password' => 'secret']));
     }
 }

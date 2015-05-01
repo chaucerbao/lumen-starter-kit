@@ -27,6 +27,18 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     protected $hidden = ['password', 'remember_token'];
 
     /**
+     * Set the password attribute only if present.
+     *
+     * @param string $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        if (!empty($value)) {
+            $this->attributes['password'] = $value;
+        }
+    }
+
+    /**
      * Attach event handlers upon instantiation.
      */
     protected static function boot()
