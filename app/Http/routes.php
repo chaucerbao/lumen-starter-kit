@@ -15,9 +15,15 @@ $app->get('/', function () use ($app) {
     return $app->welcome();
 });
 
-$app->get('login', ['as' => 'auth.login', 'uses' => 'App\Http\Controllers\AuthController@login']);
-$app->post('authenticate', ['as' => 'auth.authenticate', 'uses' => 'App\Http\Controllers\AuthController@authenticate']);
+/* Authentication */
+$app->get('login', ['as' => 'auth.createSession', 'uses' => 'App\Http\Controllers\AuthController@createSession']);
+$app->post('login', ['as' => 'auth.storeSession', 'uses' => 'App\Http\Controllers\AuthController@storeSession']);
+$app->get('account/recover', ['as' => 'auth.createRecoveryToken', 'uses' => 'App\Http\Controllers\AuthController@createRecoveryToken']);
+$app->post('account/recover', ['as' => 'auth.storeRecoveryToken', 'uses' => 'App\Http\Controllers\AuthController@storeRecoveryToken']);
+$app->get('password/reset/{token}', ['as' => 'auth.editPassword', 'uses' => 'App\Http\Controllers\AuthController@editPassword']);
+$app->put('password/reset/{token}', ['as' => 'auth.updatePassword', 'uses' => 'App\Http\Controllers\AuthController@updatePassword']);
 
+/* Users */
 $app->get('register', ['as' => 'user.create', 'uses' => 'App\Http\Controllers\UserController@create']);
 $app->get('user/{id}/edit', ['as' => 'user.edit', 'uses' => 'App\Http\Controllers\UserController@edit']);
 
