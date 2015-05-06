@@ -1,6 +1,7 @@
 <?php
 
 use App\User;
+use App\Role;
 use Faker\Factory as Faker;
 use League\FactoryMuffin\Facade as FactoryMuffin;
 
@@ -79,5 +80,39 @@ class UserTest extends TestCase
 
         $this->assertEquals($hashed_password, $user->password);
         $this->assertTrue(Auth::validate(['email' => 'a@b.cd', 'password' => 'secret']));
+    }
+
+    /**
+     * Test a boolean permission.
+     */
+    public function testCanBoolean()
+    {
+        $user = FactoryMuffin::create('App\User');
+        $role = FactoryMuffin::create('App\Role', ['name' => 'My Role']);
+        $user->roles()->attach($role);
+
+        Role::allow('My Role', 'write', 'Model');
+        Role::allow('My Role', 'write', 'Restricted', false);
+
+        $this->assertTrue($user->can('write', 'Model'));
+        $this->assertFalse($user->can('write', 'Restricted'));
+    }
+
+    /**
+     * Test a permission determined by a callback function.
+     */
+    public function testCanCallback()
+    {
+        $userA = FactoryMuffin::create('App\User');
+        $userB = FactoryMuffin::create('App\User');
+        $role = FactoryMuffin::create('App\Role', ['name' => 'My Role']);
+        $userA->roles()->attach($role);
+
+        Role::allow('My Role', 'write', 'App\User', function ($user, $target) {
+            return $user->id === $target->id;
+        });
+
+        $this->assertTrue($userA->can('write', $userA));
+        $this->assertFalse($userA->can('write', $userB));
     }
 }

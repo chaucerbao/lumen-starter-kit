@@ -49,6 +49,37 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     }
 
     /**
+     * Determines if the user can perform an action on a target.
+     *
+     * @param string        $action
+     * @param string|object $target
+     *
+     * @return bool
+     */
+    public function can($action, $target)
+    {
+        $rules = Role::$rules;
+        $object = null;
+
+        if (is_object($target)) {
+            $object = $target;
+            $target = get_class($object);
+        }
+
+        foreach ($this->roles as $role) {
+            if ($rule = $rules[$role->name][$target][$action]) {
+                if (is_callable($rule)) {
+                    $rule = call_user_func($rule, $this, $object);
+                }
+
+                return (bool) $rule;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Attach event handlers upon instantiation.
      */
     protected static function boot()
