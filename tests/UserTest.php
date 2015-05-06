@@ -15,6 +15,20 @@ class UserTest extends TestCase
     }
 
     /**
+     * Test that the roles relationship exists.
+     */
+    public function testRolesRelationship()
+    {
+        $user = FactoryMuffin::create('App\User');
+        $role = FactoryMuffin::create('App\Role');
+
+        $user->roles()->attach($role);
+
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Relations\BelongsToMany', $user->roles());
+        $this->assertInstanceOf('App\Role', $user->roles[0]);
+    }
+
+    /**
      * Test that a new password is hashed when saved.
      */
     public function testNewPasswordHashedWhenSaved()
