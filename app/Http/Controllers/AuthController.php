@@ -22,7 +22,7 @@ class AuthController extends Controller
     /**
      * Attempt to authenticate a user and create a session.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -32,7 +32,7 @@ class AuthController extends Controller
             return redirect('dashboard');
         }
 
-        return redirect('login')->withInput()->withErrors(['auth' => trans('auth.failed')]);
+        return redirect()->route('auth.createSession')->withInput()->withErrors(['auth' => trans('auth.failed')]);
     }
 
     /**
@@ -48,7 +48,7 @@ class AuthController extends Controller
     /**
      * Generate a password recovery token.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -64,7 +64,7 @@ class AuthController extends Controller
             return redirect('account/reset_requested');
         }
 
-        return redirect('account/recover')->withInput();
+        return redirect()->route('auth.createRecoveryToken')->withInput();
     }
 
     /**
@@ -82,8 +82,8 @@ class AuthController extends Controller
     /**
      * Update the password in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string                   $token
+     * @param Request $request
+     * @param string  $token
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -93,6 +93,6 @@ class AuthController extends Controller
             return redirect('account/password_set');
         }
 
-        return redirect('password/reset/'.$token)->withInput();
+        return redirect()->route('auth.editPassword', ['token' => $token])->withInput();
     }
 }

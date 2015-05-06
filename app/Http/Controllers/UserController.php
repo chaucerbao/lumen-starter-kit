@@ -36,7 +36,7 @@ class UserController extends Controller
     /**
      * Store a newly created user in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -44,14 +44,14 @@ class UserController extends Controller
     {
         $user = User::create($request->all());
 
-        return redirect('users');
+        return redirect()->route('user.index');
     }
 
     /**
      * Update the specified user in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int                      $id
+     * @param Request $request
+     * @param int     $id
      *
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -60,7 +60,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->update($request->all());
 
-        return redirect('users');
+        return redirect()->route('user.index');
     }
 
     /**
@@ -75,7 +75,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect('users');
+        return redirect()->route('user.index');
     }
 
     /**
