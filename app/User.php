@@ -58,6 +58,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      */
     public function can($action, $target)
     {
+        Permission::load();
+
         $rules = Role::$rules;
         $object = null;
 

@@ -1,7 +1,7 @@
 <?php
 
-use App\User;
 use App\Role;
+use App\User;
 use Faker\Factory as Faker;
 use League\FactoryMuffin\Facade as FactoryMuffin;
 

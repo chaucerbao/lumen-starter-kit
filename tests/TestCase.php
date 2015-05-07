@@ -55,6 +55,9 @@ class TestCase extends Laravel\Lumen\Testing\TestCase
         $files = str_replace($path_to_models.'/', 'App\\', $files);
         $files = str_replace('.php', '', $files);
 
+        /* Exclude specific models */
+        $files = array_diff($files, ['App\Permission']);
+
         /* Reset each model's event listeners */
         foreach ($files as $model) {
             call_user_func([$model, 'flushEventListeners']);
