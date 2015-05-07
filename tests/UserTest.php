@@ -30,6 +30,19 @@ class UserTest extends TestCase
     }
 
     /**
+     * Test the generation of the full name.
+     */
+    public function testGetFullName()
+    {
+        $user = FactoryMuffin::instance('App\User', [
+            'first_name' => 'George',
+            'last_name' => 'Washington',
+        ]);
+
+        $this->assertEquals('George Washington', $user->full_name);
+    }
+
+    /**
      * Test that a new password is hashed when saved.
      */
     public function testNewPasswordHashedWhenSaved()

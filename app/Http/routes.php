@@ -22,6 +22,7 @@ $app->get('account/recover', ['as' => 'auth.createRecoveryToken', 'uses' => 'App
 $app->post('account/recover', ['as' => 'auth.storeRecoveryToken', 'uses' => 'App\Http\Controllers\AuthController@storeRecoveryToken']);
 $app->get('password/reset/{token}', ['as' => 'auth.editPassword', 'uses' => 'App\Http\Controllers\AuthController@editPassword']);
 $app->put('password/reset/{token}', ['as' => 'auth.updatePassword', 'uses' => 'App\Http\Controllers\AuthController@updatePassword']);
+$app->get('account/confirmed/{token}', ['as' => 'auth.registrationConfirmed', function () {}]);
 
 /* Users */
 $app->get('register', ['as' => 'user.create', 'uses' => 'App\Http\Controllers\UserController@create']);
