@@ -53,7 +53,7 @@ class PendingUpdate extends Model
     {
         if ($pending = static::where('token', $token)->where('expires_at', '>', Carbon::now())->first()) {
             $model = call_user_func([$pending->model, 'find'], $pending->id);
-            $model->fill(empty($update) ? $pending->update : $update);
+            $model->forceFill(empty($update) ? $pending->update : $update);
 
             $result = $model->save();
             $pending->delete();

@@ -86,7 +86,7 @@ class UserControllerTest extends TestCase
      */
     public function testCreate()
     {
-        $response = $this->call('GET', '/register');
+        $response = $this->call('GET', '/user/create');
         $view = $response->original;
 
         $this->assertResponseOk();

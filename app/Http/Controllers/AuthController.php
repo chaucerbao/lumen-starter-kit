@@ -10,13 +10,55 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     /**
+     * Show the registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createUser()
+    {
+        return view('auth.register');
+    }
+
+    /**
+     * Store a newly registered user in storage.
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeUser(Request $request)
+    {
+        $user = User::create($request->all());
+
+        $pending = PendingUpdate::create([
+            'model' => 'App\User',
+            'id' => $user->id,
+            'update' => ['is_confirmed' => true],
+        ]);
+
+        return redirect()->route('auth.registerConfirmation');
+    }
+
+    /**
+     * Update a user's e-mail confirmation status.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function emailConfirmed($token)
+    {
+        PendingUpdate::apply($token);
+
+        return view('auth.email_confirmed');
+    }
+
+    /**
      * Show the authentication form (login).
      *
      * @return \Illuminate\Http\Response
      */
     public function createSession()
     {
-        return view('auth.form');
+        return view('auth.login');
     }
 
     /**
@@ -61,7 +103,7 @@ class AuthController extends Controller
                 'update' => ['password' => null],
             ]);
 
-            return redirect('account/reset_requested');
+            return redirect()->route('auth.recoverInstructions');
         }
 
         return redirect()->route('auth.createRecoveryToken')->withInput();
@@ -90,7 +132,7 @@ class AuthController extends Controller
     public function updatePassword(Request $request, $token)
     {
         if ($pending = PendingUpdate::apply($token, ['password' => $request->password])) {
-            return redirect('account/password_set');
+            return redirect()->route('auth.passwordReset');
         }
 
         return redirect()->route('auth.editPassword', ['token' => $token])->withInput();
