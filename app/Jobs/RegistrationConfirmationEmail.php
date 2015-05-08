@@ -41,7 +41,7 @@ class RegistrationConfirmationEmail extends Job
         $user = $this->user;
         $token = $this->token;
 
-        Mail::send('auth.email.registration_confirmation', compact('user', 'token'), function ($message) {
+        Mail::send('auth.email.register_confirmation', compact('user', 'token'), function ($message) {
             $message
                 ->from(env('MAIL_FROM_ADDRESS', 'support@site.com'), env('MAIL_FROM_NAME', 'Customer Support'))
                 ->to($this->user->email, $this->user->fullName)

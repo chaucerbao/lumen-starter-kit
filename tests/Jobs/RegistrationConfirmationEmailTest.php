@@ -20,7 +20,7 @@ class RegistrationConfirmationEmailTest extends TestCase
 
         Mail::shouldReceive('send')->once()
             ->with(
-                'auth.email.registration_confirmation',
+                'auth.email.register_confirmation',
                 Mockery::on(function ($data) use ($user, $token) {
                     $this->assertInstanceOf('App\User', $data['user']);
                     $this->assertEquals(1, $data['user']->id);
