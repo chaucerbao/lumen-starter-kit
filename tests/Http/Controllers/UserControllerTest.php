@@ -37,9 +37,9 @@ class UserControllerTest extends TestCase
     }
 
     /**
-     * Test storing a new user.
+     * Test successfully storing a new user.
      */
-    public function testStore()
+    public function testStoreSuccess()
     {
         $user = FactoryMuffin::instance('App\User');
         $this->assertEquals(0, User::count());
@@ -51,20 +51,54 @@ class UserControllerTest extends TestCase
     }
 
     /**
-     * Test updating an existing user.
+     * Test failing to store a new user.
      */
-    public function testUpdate()
+    public function testStoreFail()
+    {
+        $user = FactoryMuffin::instance('App\User', ['email' => '']);
+        $this->assertEquals(0, User::count());
+
+        session()->setPreviousUrl('http://localhost/user/create');
+        $response = $this->call('POST', '/users', $this->csrf($user->getAttributes()));
+
+        $this->assertEquals(0, User::count());
+        $this->assertSessionHasErrors();
+        $this->assertRedirectedTo('user/create');
+    }
+
+    /**
+     * Test successfully updating an existing user.
+     */
+    public function testUpdateSuccess()
     {
         $user = FactoryMuffin::create('App\User');
         $this->assertEquals(1, User::count());
         $this->assertNotEquals('a@b.cd', $user->email);
 
-        $response = $this->call('PUT', '/user/1', $this->csrf(['email' => 'a@b.cd']));
+        $response = $this->call('PUT', '/user/1', $this->csrf(['email' => 'a@b.cd'] + $user->getAttributes()));
 
         $user = $user->fresh();
         $this->assertEquals(1, User::count());
         $this->assertEquals('a@b.cd', $user->email);
         $this->assertRedirectedTo('users');
+    }
+
+    /**
+     * Test failing to update an existing user.
+     */
+    public function testUpdateFail()
+    {
+        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        $this->assertEquals(1, User::count());
+
+        session()->setPreviousUrl('http://localhost/user/1/edit');
+        $response = $this->call('PUT', '/user/1', $this->csrf(['email' => ''] + $user->getAttributes()));
+
+        $user = $user->fresh();
+        $this->assertEquals(1, User::count());
+        $this->assertEquals('a@b.cd', $user->email);
+        $this->assertSessionHasErrors();
+        $this->assertRedirectedTo('user/1/edit');
     }
 
     /**

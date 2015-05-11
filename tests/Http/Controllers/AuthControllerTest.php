@@ -32,21 +32,19 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreUserFail()
     {
-        $this->markTestIncomplete();
-        $user = FactoryMuffin::instance('App\User', [
+        session()->setPreviousUrl('http://localhost/register');
+        $response = $this->call('POST', '/register', $this->csrf([
             'first_name' => 'George',
             'last_name' => 'Washington',
-            'email' => 'a@b.cd',
+            'email' => '',
             'password' => 'secret',
-        ]);
+        ]));
 
-        $response = $this->call('POST', '/register', $this->csrf($user->getAttributes()));
-
-        $this->assertRedirectedTo('register');
         $this->assertEquals('George', old('first_name'));
         $this->assertEquals('Washington', old('last_name'));
-        $this->assertEquals('a@b.cd', old('email'));
-        $this->assertEmpty(old('password'));
+        $this->assertEmpty(old('email'));
+        $this->assertSessionHasErrors();
+        $this->assertRedirectedTo('register');
     }
 
     /**
@@ -103,6 +101,7 @@ class AuthControllerTest extends TestCase
         $response = $this->call('POST', '/login', $this->csrf(['email' => 'a@b.cd', 'password' => 'wrongPassword']));
 
         $this->assertEquals('a@b.cd', old('email'));
+        $this->assertSessionHasErrors();
         $this->assertRedirectedTo('login');
     }
 
@@ -135,9 +134,11 @@ class AuthControllerTest extends TestCase
     {
         $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
 
+        session()->setPreviousUrl('http://localhost/account/recover');
         $response = $this->call('POST', '/account/recover', $this->csrf(['email' => 'w@x.yz']));
 
         $this->assertEquals('w@x.yz', old('email'));
+        $this->assertSessionHasErrors();
         $this->assertRedirectedTo('account/recover');
     }
 
@@ -176,18 +177,17 @@ class AuthControllerTest extends TestCase
      */
     public function testUpdatePasswordFail()
     {
-        $token = 'bad-token';
         $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
 
         $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
         $pending->update = ['password' => null];
         $pending->save();
 
-        $this->assertFalse(Auth::attempt(['email' => 'a@b.cd', 'password' => 'new-secret']));
+        session()->setPreviousUrl('http://localhost/account/reset/'.$pending->token);
+        $response = $this->call('PUT', '/account/reset/'.$pending->token, $this->csrf(['password' => '']));
 
-        $response = $this->call('PUT', '/account/reset/'.$token, $this->csrf(['password' => 'new-secret']));
-
-        $this->assertFalse(Auth::attempt(['email' => 'a@b.cd', 'password' => 'new-secret']));
-        $this->assertRedirectedTo('account/reset/'.$token);
+        $this->assertFalse(Auth::attempt(['email' => 'a@b.cd', 'password' => '']));
+        $this->assertSessionHasErrors();
+        $this->assertRedirectedTo('account/reset/'.$pending->token);
     }
 }

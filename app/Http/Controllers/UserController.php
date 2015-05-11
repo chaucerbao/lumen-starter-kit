@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RegistrationConfirmationEmail;
+use App\PendingUpdate;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Queue;
 
 class UserController extends Controller
 {
@@ -42,7 +45,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, User::$rules);
+
         $user = User::create($request->all());
+
+        $pending = PendingUpdate::create([
+            'model' => 'App\User',
+            'id' => $user->id,
+            'update' => ['is_confirmed' => true],
+        ]);
+        Queue::push(new RegistrationConfirmationEmail($user, $pending->token));
 
         return redirect()->route('user.index');
     }
@@ -57,6 +69,12 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $rules = User::$rules;
+        if (empty($request->input('password'))) {
+            unset($rules['password']);
+        }
+        $this->validate($request, $rules);
+
         $user = User::findOrFail($id);
         $user->update($request->all());
 

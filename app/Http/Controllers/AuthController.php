@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RegistrationConfirmationEmail;
 use App\PendingUpdate;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Queue;
 
 class AuthController extends Controller
 {
@@ -28,6 +30,8 @@ class AuthController extends Controller
      */
     public function storeUser(Request $request)
     {
+        $this->validate($request, User::$rules);
+
         $user = User::create($request->all());
 
         $pending = PendingUpdate::create([
@@ -35,6 +39,7 @@ class AuthController extends Controller
             'id' => $user->id,
             'update' => ['is_confirmed' => true],
         ]);
+        Queue::push(new RegistrationConfirmationEmail($user, $pending->token));
 
         return redirect()->route('auth.registerConfirmation');
     }
@@ -96,17 +101,16 @@ class AuthController extends Controller
      */
     public function storeRecoveryToken(Request $request)
     {
-        if ($user = User::where('email', $request->email)->first()) {
-            $pending = PendingUpdate::create([
-                'model' => 'App\User',
-                'id' => $user->id,
-                'update' => ['password' => null],
-            ]);
+        $this->validate($request, ['email' => 'required|email|exists:users']);
 
-            return redirect()->route('auth.recoverInstructions');
-        }
+        $user = User::where('email', $request->email)->first();
+        $pending = PendingUpdate::create([
+            'model' => 'App\User',
+            'id' => $user->id,
+            'update' => ['password' => null],
+        ]);
 
-        return redirect()->route('auth.createRecoveryToken')->withInput();
+        return redirect()->route('auth.recoverInstructions');
     }
 
     /**
@@ -131,10 +135,12 @@ class AuthController extends Controller
      */
     public function updatePassword(Request $request, $token)
     {
+        $this->validate($request, array_only(User::$rules, ['password']));
+
         if ($pending = PendingUpdate::apply($token, ['password' => $request->password])) {
             return redirect()->route('auth.passwordReset');
         }
 
-        return redirect()->route('auth.editPassword', ['token' => $token])->withInput();
+        return redirect()->route('auth.editPassword', ['token' => $token])->withInput()->withErrors(['token' => trans('auth.bad_token')]);
     }
 }

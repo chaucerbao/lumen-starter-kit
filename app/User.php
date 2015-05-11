@@ -27,6 +27,18 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     protected $hidden = ['password', 'is_confirmed', 'remember_token'];
 
     /**
+     * The validation rules for this model.
+     *
+     * @var array
+     */
+    public static $rules = [
+        'first_name' => 'required',
+        'last_name' => 'required',
+        'email' => 'required|email',
+        'password' => 'required',
+    ];
+
+    /**
      * Many-to-many relationship with roles.
      *
      * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
