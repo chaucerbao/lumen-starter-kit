@@ -18,26 +18,25 @@ class RegistrationConfirmationEmailTest extends TestCase
         ]);
         $token = 'a1b2c3d4e5';
 
-        Mail::shouldReceive('send')->once()
-            ->with(
-                'auth.email.register_confirmation',
-                Mockery::on(function ($data) use ($user, $token) {
-                    $this->assertInstanceOf('App\User', $data['user']);
-                    $this->assertEquals(1, $data['user']->id);
-                    $this->assertEquals('a1b2c3d4e5', $data['token']);
+        Mail::shouldReceive('send')->once()->with(
+            'auth.email.register_confirmation',
+            Mockery::on(function ($data) use ($user, $token) {
+                $this->assertInstanceOf('App\User', $data['user']);
+                $this->assertEquals(1, $data['user']->id);
+                $this->assertEquals('a1b2c3d4e5', $data['token']);
 
-                    return true;
-                }),
-                Mockery::on(function ($closure) {
-                    $message = Mockery::mock('Illuminate\Mail\Mailer');
-                    $message->shouldReceive('from')->andReturn(Mockery::self());
-                    $message->shouldReceive('to')->with('a@b.cd', 'George Washington')->andReturn(Mockery::self());
-                    $message->shouldReceive('subject')->andReturn(Mockery::self());
-                    $closure($message);
+                return true;
+            }),
+            Mockery::on(function ($closure) {
+                $message = Mockery::mock('Illuminate\Mail\Mailer');
+                $message->shouldReceive('from')->andReturn(Mockery::self());
+                $message->shouldReceive('to')->with('a@b.cd', 'George Washington')->andReturn(Mockery::self());
+                $message->shouldReceive('subject')->andReturn(Mockery::self());
+                $closure($message);
 
-                    return true;
-                })
-            );
+                return true;
+            }
+        ));
 
         Queue::push(new RegistrationConfirmationEmail($user, $token));
     }

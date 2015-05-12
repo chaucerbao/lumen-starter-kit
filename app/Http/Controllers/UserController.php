@@ -6,7 +6,6 @@ use App\Jobs\RegistrationConfirmationEmail;
 use App\PendingUpdate;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Queue;
 
 class UserController extends Controller
 {
@@ -54,7 +53,7 @@ class UserController extends Controller
             'id' => $user->id,
             'update' => ['is_confirmed' => true],
         ]);
-        Queue::push(new RegistrationConfirmationEmail($user, $pending->token));
+        $this->dispatch(new RegistrationConfirmationEmail($user, $pending->token));
 
         return redirect()->route('user.index');
     }
