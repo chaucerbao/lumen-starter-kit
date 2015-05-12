@@ -26,7 +26,7 @@ class UserControllerTest extends TestCase
      */
     public function testShow()
     {
-        $user = FactoryMuffin::create('App\User');
+        FactoryMuffin::create('App\User');
 
         $response = $this->call('GET', '/user/1');
         $view = $response->original;
@@ -106,7 +106,7 @@ class UserControllerTest extends TestCase
      */
     public function testDestroy()
     {
-        $user = FactoryMuffin::create('App\User');
+        FactoryMuffin::create('App\User');
         $this->assertEquals(1, User::count());
 
         $response = $this->call('DELETE', '/user/1', $this->csrf());
@@ -133,7 +133,8 @@ class UserControllerTest extends TestCase
      */
     public function testEdit()
     {
-        $user = FactoryMuffin::create('App\User');
+        FactoryMuffin::create('App\User');
+        FactoryMuffin::create('App\Role');
 
         $response = $this->call('GET', '/user/1/edit');
         $view = $response->original;
@@ -141,5 +142,7 @@ class UserControllerTest extends TestCase
         $this->assertResponseOk();
         $this->assertInstanceOf('App\User', $view['user']);
         $this->assertEquals(1, $view['user']->id);
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $view['roles']);
+        $this->assertInstanceOf('App\Role', $view['roles']->first());
     }
 }

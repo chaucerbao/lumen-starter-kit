@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\RegistrationConfirmationEmail;
 use App\PendingUpdate;
+use App\Role;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -117,7 +118,8 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
+        $roles = Role::all();
 
-        return view('user.form', compact('user'));
+        return view('user.form', compact('user', 'roles'));
     }
 }
