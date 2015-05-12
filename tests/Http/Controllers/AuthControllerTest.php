@@ -84,7 +84,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreSessionSuccess()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
+        FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
 
         $response = $this->call('POST', '/login', $this->csrf(['email' => 'a@b.cd', 'password' => 'secret']));
 
@@ -96,7 +96,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreSessionFail()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
+        FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
 
         $response = $this->call('POST', '/login', $this->csrf(['email' => 'a@b.cd', 'password' => 'wrongPassword']));
 
@@ -120,7 +120,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreRecoveryTokenSuccess()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
 
         $response = $this->call('POST', '/account/recover', $this->csrf(['email' => 'a@b.cd']));
 
@@ -132,7 +132,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreRecoveryTokenFail()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
 
         session()->setPreviousUrl('http://localhost/account/recover');
         $response = $this->call('POST', '/account/recover', $this->csrf(['email' => 'w@x.yz']));
@@ -158,7 +158,7 @@ class AuthControllerTest extends TestCase
      */
     public function testUpdatePasswordSuccess()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
 
         $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
         $pending->update = ['password' => null];
@@ -177,7 +177,7 @@ class AuthControllerTest extends TestCase
      */
     public function testUpdatePasswordFail()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
 
         $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
         $pending->update = ['password' => null];
