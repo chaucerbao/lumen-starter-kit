@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\PendingUpdate;
 use App\User;
 use Illuminate\Support\Facades\Mail;
 
@@ -15,11 +16,11 @@ class SendPendingUpdateConfirmationRequestEmail extends Job
     protected $user;
 
     /**
-     * The user's confirmation token.
+     * The array of key/value pairs that will be updated.
      *
-     * @var string
+     * @var array
      */
-    protected $token;
+    protected $update;
 
     /**
      * The e-mail's subject line.
@@ -39,14 +40,14 @@ class SendPendingUpdateConfirmationRequestEmail extends Job
      * Create a new command instance.
      *
      * @param User   $user
-     * @param string $token
+     * @param array  $update
      * @param string $subject
      * @param string $view
      */
-    public function __construct(User $user, $token, $subject, $view)
+    public function __construct(User $user, array $update, $subject, $view)
     {
         $this->user = $user;
-        $this->token = $token;
+        $this->update = $update;
         $this->subject = $subject;
         $this->view = $view;
     }
@@ -57,8 +58,13 @@ class SendPendingUpdateConfirmationRequestEmail extends Job
     public function handle()
     {
         $user = $this->user;
-        $token = $this->token;
         $subject = $this->subject;
+
+        $pending = PendingUpdate::create([
+            'model' => $user,
+            'update' => $this->update,
+        ]);
+        $token = $pending->token;
 
         Mail::send($this->view, compact('user', 'token'), function ($message) use ($user, $subject) {
             $message

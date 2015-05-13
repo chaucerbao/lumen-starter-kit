@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendPendingUpdateConfirmationRequestEmail;
-use App\PendingUpdate;
 use App\Role;
 use App\User;
 use Illuminate\Http\Request;
@@ -48,12 +47,7 @@ class UserController extends Controller
         $this->validate($request, User::$rules);
 
         $user = User::create($request->all());
-
-        $pending = PendingUpdate::create([
-            'model' => $user,
-            'update' => ['is_confirmed' => true],
-        ]);
-        $this->dispatch(new SendPendingUpdateConfirmationRequestEmail($user, $pending->token, 'Registration confirmation', 'auth.email.register_confirmation'));
+        $this->dispatch(new SendPendingUpdateConfirmationRequestEmail($user, ['is_confirmed' => true], 'Registration confirmation', 'auth.email.register_confirmation'));
 
         return redirect()->route('user.index');
     }

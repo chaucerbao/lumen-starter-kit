@@ -32,12 +32,7 @@ class AuthController extends Controller
         $this->validate($request, User::$rules);
 
         $user = User::create($request->all());
-
-        $pending = PendingUpdate::create([
-            'model' => $user,
-            'update' => ['is_confirmed' => true],
-        ]);
-        $this->dispatch(new SendPendingUpdateConfirmationRequestEmail($user, $pending->token, 'Registration confirmation', 'auth.email.register_confirmation'));
+        $this->dispatch(new SendPendingUpdateConfirmationRequestEmail($user, ['is_confirmed' => true], 'Registration confirmation', 'auth.email.register_confirmation'));
 
         return redirect()->route('auth.registerConfirmation');
     }
@@ -102,10 +97,7 @@ class AuthController extends Controller
         $this->validate($request, ['email' => 'required|email|exists:users']);
 
         $user = User::where('email', $request->email)->first();
-        $pending = PendingUpdate::create([
-            'model' => $user,
-            'update' => ['password' => null],
-        ]);
+        $this->dispatch(new SendPendingUpdateConfirmationRequestEmail($user, ['password' => null], 'Account recovery', 'auth.email.recover_instructions'));
 
         return redirect()->route('auth.recoverInstructions');
     }
