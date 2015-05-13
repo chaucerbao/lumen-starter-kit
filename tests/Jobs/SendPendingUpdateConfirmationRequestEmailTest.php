@@ -1,15 +1,15 @@
 <?php
 
-use App\Jobs\RegistrationConfirmationEmail;
+use App\Jobs\SendPendingUpdateConfirmationRequestEmail;
 use Illuminate\Support\Facades\Queue;
 use League\FactoryMuffin\Facade as FactoryMuffin;
 
-class RegistrationConfirmationEmailTest extends TestCase
+class SendPendingUpdateConfirmationRequestEmailTest extends TestCase
 {
     /**
-     * Test the registration confirmation email.
+     * Test sending a pending update confirmation request e-mail.
      */
-    public function testHandler()
+    public function testHandle()
     {
         $user = FactoryMuffin::create('App\User', [
             'first_name' => 'George',
@@ -17,10 +17,11 @@ class RegistrationConfirmationEmailTest extends TestCase
             'email' => 'a@b.cd',
         ]);
         $token = 'a1b2c3d4e5';
+        $subject = 'Confirmation Request';
 
         Mail::shouldReceive('send')->once()->with(
-            'auth.email.register_confirmation',
-            Mockery::on(function ($data) use ($user, $token) {
+            'email.confirmation_request',
+            Mockery::on(function ($data) {
                 $this->assertInstanceOf('App\User', $data['user']);
                 $this->assertEquals(1, $data['user']->id);
                 $this->assertEquals('a1b2c3d4e5', $data['token']);
@@ -31,13 +32,13 @@ class RegistrationConfirmationEmailTest extends TestCase
                 $message = Mockery::mock('Illuminate\Mail\Mailer');
                 $message->shouldReceive('from')->andReturn(Mockery::self());
                 $message->shouldReceive('to')->with('a@b.cd', 'George Washington')->andReturn(Mockery::self());
-                $message->shouldReceive('subject')->andReturn(Mockery::self());
+                $message->shouldReceive('subject')->with('Confirmation Request')->andReturn(Mockery::self());
                 $closure($message);
 
                 return true;
             }
         ));
 
-        Queue::push(new RegistrationConfirmationEmail($user, $token));
+        Queue::push(new SendPendingUpdateConfirmationRequestEmail($user, $token, 'Confirmation Request', 'email.confirmation_request'));
     }
 }

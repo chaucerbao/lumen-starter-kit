@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\RegistrationConfirmationEmail;
+use App\Jobs\SendPendingUpdateConfirmationRequestEmail;
 use App\PendingUpdate;
 use App\Role;
 use App\User;
@@ -54,7 +54,7 @@ class UserController extends Controller
             'id' => $user->id,
             'update' => ['is_confirmed' => true],
         ]);
-        $this->dispatch(new RegistrationConfirmationEmail($user, $pending->token));
+        $this->dispatch(new SendPendingUpdateConfirmationRequestEmail($user, $pending->token, 'Registration confirmation', 'auth.email.register_confirmation'));
 
         return redirect()->route('user.index');
     }
