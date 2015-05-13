@@ -13,7 +13,6 @@ class CreatePendingUpdatesTable extends Migration
         Schema::create('pending_updates', function (Blueprint $table) {
             $table->string('token');
             $table->string('model');
-            $table->integer('id');
             $table->string('update');
             $table->timestamp('expires_at');
             $table->timestamps();

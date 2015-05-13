@@ -53,13 +53,15 @@ class AuthControllerTest extends TestCase
     public function testEmailConfirmed()
     {
         $user = FactoryMuffin::create('App\User');
+        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending->fill([
+            'model' => $user,
+            'update' => ['is_confirmed' => true],
+        ]);
+        $pending->save();
 
         $user = $user->fresh();
         $this->assertFalse((bool) $user->is_confirmed);
-
-        $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
-        $pending->update = ['is_confirmed' => true];
-        $pending->save();
 
         $response = $this->call('GET', '/email/confirmed/'.$pending->token);
 
@@ -158,10 +160,11 @@ class AuthControllerTest extends TestCase
      */
     public function testUpdatePasswordSuccess()
     {
-        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-
-        $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
-        $pending->update = ['password' => null];
+        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending->fill([
+            'model' => FactoryMuffin::create('App\User', ['email' => 'a@b.cd']),
+            'update' => ['password' => null],
+        ]);
         $pending->save();
 
         $this->assertFalse(Auth::attempt(['email' => 'a@b.cd', 'password' => 'new-secret']));
@@ -177,10 +180,11 @@ class AuthControllerTest extends TestCase
      */
     public function testUpdatePasswordFail()
     {
-        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-
-        $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
-        $pending->update = ['password' => null];
+        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending->fill([
+            'model' => FactoryMuffin::create('App\User', ['email' => 'a@b.cd']),
+            'update' => ['password' => null],
+        ]);
         $pending->save();
 
         session()->setPreviousUrl('http://localhost/account/reset/'.$pending->token);

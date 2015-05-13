@@ -2,7 +2,6 @@
 
 use App\PendingUpdate;
 use Carbon\Carbon;
-/* use Faker\Factory as Faker; */
 use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class PendingUpdateTest extends TestCase
@@ -13,6 +12,20 @@ class PendingUpdateTest extends TestCase
     public function testInstantiation()
     {
         $this->assertInstanceOf('App\PendingUpdate', new PendingUpdate());
+    }
+
+    /**
+     * Test that the model attribute is (de)serialized on get/set.
+     */
+    public function testModelDeSerializedOnGetSet()
+    {
+        $pending = FactoryMuffin::instance('App\PendingUpdate');
+
+        $pending->model = FactoryMuffin::create('App\User');
+
+        $this->assertEquals('a:2:{i:0;s:8:"App\User";i:1;i:1;}', $pending->getAttributes()['model']);
+        $this->assertInstanceOf('App\User', $pending->model);
+        $this->assertEquals(1, $pending->model->id);
     }
 
     /**
@@ -34,8 +47,10 @@ class PendingUpdateTest extends TestCase
     public function testTokenAndExpiresGeneratedOnCreate()
     {
         $pending = FactoryMuffin::instance('App\PendingUpdate');
-
-        $pending->update = ['a' => 1, 'b' => 'two'];
+        $pending->fill([
+            'model' => FactoryMuffin::create('App\User'),
+            'update' => ['email' => 'w@x.yz'],
+        ]);
 
         $this->assertNull($pending->token);
         $this->assertNull($pending->expires_at);
@@ -52,8 +67,11 @@ class PendingUpdateTest extends TestCase
     public function testApplySuccess()
     {
         $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-        $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
-        $pending->update = ['email' => 'w@x.yz'];
+        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending->fill([
+            'model' => $user,
+            'update' => ['email' => 'w@x.yz'],
+        ]);
         $pending->save();
 
         $this->assertEquals('a@b.cd', $user->email);
@@ -63,7 +81,7 @@ class PendingUpdateTest extends TestCase
         $user = $user->fresh();
         $this->assertEquals('w@x.yz', $user->email);
         $this->assertTrue($result);
-        $this->assertNull(PendingUpdate::where('token', $pending->token)->first());
+        $this->assertNull(PendingUpdate::find($pending->token));
     }
 
     /**
@@ -72,8 +90,11 @@ class PendingUpdateTest extends TestCase
     public function testApplyOverrideSuccess()
     {
         $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-        $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
-        $pending->update = ['email' => 'w@x.yz'];
+        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending->fill([
+            'model' => $user,
+            'update' => ['email' => 'w@x.yz'],
+        ]);
         $pending->save();
 
         $this->assertEquals('a@b.cd', $user->email);
@@ -83,7 +104,7 @@ class PendingUpdateTest extends TestCase
         $user = $user->fresh();
         $this->assertEquals('l@m.no', $user->email);
         $this->assertTrue($result);
-        $this->assertNull(PendingUpdate::where('token', $pending->token)->first());
+        $this->assertNull(PendingUpdate::find($pending->token));
     }
 
     /**
@@ -92,9 +113,12 @@ class PendingUpdateTest extends TestCase
     public function testApplyFail()
     {
         $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-        $pending = FactoryMuffin::instance('App\PendingUpdate', ['model' => 'App\User', 'id' => 1]);
-        $pending->update = ['email' => 'w@x.yz'];
-        $pending->expires_at = Carbon::now()->subSecond();
+        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending->fill([
+            'model' => $user,
+            'update' => ['email' => 'w@x.yz'],
+            'expires_at' => Carbon::now()->subSecond(),
+        ]);
         $pending->save();
 
         $this->assertEquals('a@b.cd', $user->email);

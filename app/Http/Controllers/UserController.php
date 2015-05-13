@@ -50,8 +50,7 @@ class UserController extends Controller
         $user = User::create($request->all());
 
         $pending = PendingUpdate::create([
-            'model' => 'App\User',
-            'id' => $user->id,
+            'model' => $user,
             'update' => ['is_confirmed' => true],
         ]);
         $this->dispatch(new SendPendingUpdateConfirmationRequestEmail($user, $pending->token, 'Registration confirmation', 'auth.email.register_confirmation'));
