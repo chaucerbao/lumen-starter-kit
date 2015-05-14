@@ -1,7 +1,7 @@
 @extends('layout.email')
 
 @section('body')
-Hello {{ $user->full_name }}
+{{ $user->full_name }},
 
-<a href="{{ route('auth.emailConfirmed', ['token' => $token]) }}">Confirm Registration</a>
+<a href="{{ route('auth.emailConfirmed', ['token' => $token]) }}">{{ trans('auth.confirm_registration') }}</a>
 @stop
