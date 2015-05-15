@@ -19,7 +19,7 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-// $app->withFacades();
+$app->withFacades();
 
 $app->withEloquent();
 
@@ -59,7 +59,7 @@ $app->middleware([
     // 'Illuminate\Cookie\Middleware\EncryptCookies',
     // 'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse',
     'Illuminate\Session\Middleware\StartSession',
-    // 'Illuminate\View\Middleware\ShareErrorsFromSession',
+    'Illuminate\View\Middleware\ShareErrorsFromSession',
     'Laravel\Lumen\Http\Middleware\VerifyCsrfToken',
 ]);
 
