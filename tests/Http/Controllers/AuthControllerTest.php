@@ -61,12 +61,12 @@ class AuthControllerTest extends TestCase
         $pending->save();
 
         $user = $user->fresh();
-        $this->assertFalse((bool) $user->is_confirmed);
+        $this->assertFalse($user->is_confirmed);
 
         $response = $this->call('GET', '/email/confirmed/'.$pending->token);
 
         $user = $user->fresh();
-        $this->assertTrue((bool) $user->is_confirmed);
+        $this->assertTrue($user->is_confirmed);
 
         $this->assertResponseOk();
     }

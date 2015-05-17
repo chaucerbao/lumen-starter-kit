@@ -27,6 +27,15 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     protected $hidden = ['password', 'is_confirmed', 'remember_token'];
 
     /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_confirmed' => 'boolean',
+    ];
+
+    /**
      * The validation rules for this model.
      *
      * @var array
