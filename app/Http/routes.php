@@ -37,3 +37,12 @@ $app->post('users', ['as' => 'user.store', 'uses' => 'App\Http\Controllers\UserC
 $app->get('user/{id}', ['as' => 'user.show', 'uses' => 'App\Http\Controllers\UserController@show']);
 $app->put('user/{id}', ['as' => 'user.update', 'uses' => 'App\Http\Controllers\UserController@update']);
 $app->delete('user/{id}', ['as' => 'user.destroy', 'uses' => 'App\Http\Controllers\UserController@destroy']);
+
+/* Posts */
+$app->get('post/create', ['as' => 'post.create', 'uses' => 'App\Http\Controllers\PostController@create']);
+$app->get('post/{slug}/edit', ['as' => 'post.edit', 'uses' => 'App\Http\Controllers\PostController@edit']);
+$app->get('posts', ['as' => 'post.index', 'uses' => 'App\Http\Controllers\PostController@index']);
+$app->post('posts', ['as' => 'post.store', 'uses' => 'App\Http\Controllers\PostController@store']);
+$app->get('post/{slug}', ['as' => 'post.show', 'uses' => 'App\Http\Controllers\PostController@show']);
+$app->put('post/{slug}', ['as' => 'post.update', 'uses' => 'App\Http\Controllers\PostController@update']);
+$app->delete('post/{slug}', ['as' => 'post.destroy', 'uses' => 'App\Http\Controllers\PostController@destroy']);
