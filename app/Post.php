@@ -42,7 +42,7 @@ class Post extends Model
         'title' => 'required',
         'body' => 'required',
         'is_active' => 'boolean',
-        'published_at' => 'required_if:is_active,true|date',
+        'published_at' => 'required|date',
     ];
 
     /**

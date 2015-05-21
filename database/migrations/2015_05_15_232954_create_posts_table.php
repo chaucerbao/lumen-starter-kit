@@ -17,7 +17,7 @@ class CreatePostsTable extends Migration
             $table->string('title');
             $table->text('body');
             $table->boolean('is_active')->default(false);
-            $table->timestamp('published_at')->nullable();
+            $table->timestamp('published_at');
             $table->softDeletes();
             $table->timestamps();
 
