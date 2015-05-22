@@ -94,6 +94,19 @@ class AuthControllerTest extends TestCase
     }
 
     /**
+     * Test a successful authentication with a redirect to an intended URL.
+     */
+    public function testStoreSessionRedirectIntended()
+    {
+        FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
+
+        session()->flash('url.intended', 'some/url');
+        $response = $this->call('POST', '/login', $this->csrf(['email' => 'a@b.cd', 'password' => 'secret']));
+
+        $this->assertRedirectedTo('some/url');
+    }
+
+    /**
      * Test a failed authentication.
      */
     public function testStoreSessionFail()
@@ -105,6 +118,24 @@ class AuthControllerTest extends TestCase
         $this->assertEquals('a@b.cd', old('email'));
         $this->assertSessionHasErrors();
         $this->assertRedirectedTo('login');
+    }
+
+    /**
+     * Test a de-authentication.
+     */
+    public function testDestroySession()
+    {
+        $user = FactoryMuffin::create('App\User');
+        $this->be($user);
+
+        $this->assertEquals(1, Auth::user()->id);
+
+        session()->setPreviousUrl('http://localhost/some/url');
+        $response = $this->call('GET', '/logout');
+
+        $this->assertNull(Auth::user());
+
+        $this->assertRedirectedTo('http://localhost/some/url');
     }
 
     /**

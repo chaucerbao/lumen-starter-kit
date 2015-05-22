@@ -56,6 +56,8 @@ class AuthController extends Controller
      */
     public function createSession()
     {
+        session()->keep(['url.intended']);
+
         return view('auth.login');
     }
 
@@ -69,10 +71,24 @@ class AuthController extends Controller
     public function storeSession(Request $request)
     {
         if (Auth::attempt($request->only('email', 'password'), true)) {
-            return redirect('dashboard');
+            return redirect(session()->pull('url.intended', 'dashboard'));
         }
 
+        session()->keep(['url.intended']);
+
         return redirect()->route('auth.createSession')->withInput()->withErrors(['auth' => trans('auth.failed')]);
+    }
+
+    /**
+     * Destroy the session (logout).
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroySession()
+    {
+        Auth::logout();
+
+        return redirect()->back();
     }
 
     /**
