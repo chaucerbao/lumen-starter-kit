@@ -52,4 +52,12 @@ $app->group(['prefix' => 'auth', 'middleware' => 'auth', 'namespace' => 'App\Htt
     $app->get('post/{slug}', ['as' => 'post.show', 'uses' => 'PostController@show']);
     $app->put('post/{slug}', ['as' => 'post.update', 'uses' => 'PostController@update']);
     $app->delete('post/{slug}', ['as' => 'post.destroy', 'uses' => 'PostController@destroy']);
+
+    /* Tags */
+    $app->get('tag/create', ['as' => 'tag.create', 'uses' => 'TagController@create']);
+    $app->get('tag/{id}/edit', ['as' => 'tag.edit', 'uses' => 'TagController@edit']);
+    $app->get('tags', ['as' => 'tag.index', 'uses' => 'TagController@index']);
+    $app->post('tags', ['as' => 'tag.store', 'uses' => 'TagController@store']);
+    $app->put('tag/{id}', ['as' => 'tag.update', 'uses' => 'TagController@update']);
+    $app->delete('tag/{id}', ['as' => 'tag.destroy', 'uses' => 'TagController@destroy']);
 });

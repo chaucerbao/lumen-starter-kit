@@ -56,6 +56,16 @@ class Post extends Model
     }
 
     /**
+     * Many-to-many relationship with tags.
+     *
+     * @return Illuminate\Database\Eloquent\Relations\MorphToMany
+     */
+    public function tags()
+    {
+        return $this->morphToMany('App\Tag', 'taggable');
+    }
+
+    /**
      * Scope for posts that are active and published before now.
      *
      * @return Builder

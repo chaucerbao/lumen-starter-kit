@@ -29,6 +29,20 @@ class PostTest extends TestCase
     }
 
     /**
+     * Test that the tags relationship exists.
+     */
+    public function testTagsRelationship()
+    {
+        $post = FactoryMuffin::create('App\Post');
+        $tag = FactoryMuffin::create('App\Tag');
+
+        $post->tags()->attach($tag);
+
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Relations\MorphToMany', $post->tags());
+        $this->assertInstanceOf('App\Tag', $post->tags[0]);
+    }
+
+    /**
      * Test that the published scope filters successfully.
      */
     public function testScopePublished()
