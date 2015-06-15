@@ -6,13 +6,24 @@ use League\FactoryMuffin\Facade as FactoryMuffin;
 class UserControllerTest extends TestCase
 {
     /**
+     * Run before each test.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $user = FactoryMuffin::create('App\User');
+        $this->be($user);
+    }
+
+    /**
      * Test the index page.
      */
     public function testIndex()
     {
-        FactoryMuffin::seed(3, 'App\User');
+        FactoryMuffin::seed(2, 'App\User');
 
-        $response = $this->call('GET', '/users');
+        $response = $this->call('GET', '/auth/users');
         $view = $response->original;
 
         $this->assertResponseOk();
@@ -26,9 +37,7 @@ class UserControllerTest extends TestCase
      */
     public function testShow()
     {
-        FactoryMuffin::create('App\User');
-
-        $response = $this->call('GET', '/user/1');
+        $response = $this->call('GET', '/auth/user/1');
         $view = $response->original;
 
         $this->assertResponseOk();
@@ -42,12 +51,12 @@ class UserControllerTest extends TestCase
     public function testStoreSuccess()
     {
         $user = FactoryMuffin::instance('App\User');
-        $this->assertEquals(0, User::count());
-
-        $response = $this->call('POST', '/users', $this->csrf($user->getAttributes()));
-
         $this->assertEquals(1, User::count());
-        $this->assertRedirectedTo('users');
+
+        $response = $this->call('POST', '/auth/users', $this->csrf($user->getAttributes()));
+
+        $this->assertEquals(2, User::count());
+        $this->assertRedirectedTo('auth/users');
     }
 
     /**
@@ -56,14 +65,14 @@ class UserControllerTest extends TestCase
     public function testStoreFail()
     {
         $user = FactoryMuffin::instance('App\User', ['email' => '']);
-        $this->assertEquals(0, User::count());
+        $this->assertEquals(1, User::count());
 
-        session()->setPreviousUrl('http://localhost/user/create');
-        $response = $this->call('POST', '/users', $this->csrf($user->getAttributes()));
+        session()->setPreviousUrl('http://localhost/auth/user/create');
+        $response = $this->call('POST', '/auth/users', $this->csrf($user->getAttributes()));
 
-        $this->assertEquals(0, User::count());
+        $this->assertEquals(1, User::count());
         $this->assertSessionHasErrors();
-        $this->assertRedirectedTo('user/create');
+        $this->assertRedirectedTo('auth/user/create');
     }
 
     /**
@@ -72,15 +81,15 @@ class UserControllerTest extends TestCase
     public function testUpdateSuccess()
     {
         $user = FactoryMuffin::create('App\User');
-        $this->assertEquals(1, User::count());
+        $this->assertEquals(2, User::count());
         $this->assertNotEquals('a@b.cd', $user->email);
 
-        $response = $this->call('PUT', '/user/1', $this->csrf(['email' => 'a@b.cd'] + $user->getAttributes()));
+        $response = $this->call('PUT', '/auth/user/2', $this->csrf(['email' => 'a@b.cd'] + $user->getAttributes()));
 
         $user = $user->fresh();
-        $this->assertEquals(1, User::count());
+        $this->assertEquals(2, User::count());
         $this->assertEquals('a@b.cd', $user->email);
-        $this->assertRedirectedTo('users');
+        $this->assertRedirectedTo('auth/users');
     }
 
     /**
@@ -89,16 +98,16 @@ class UserControllerTest extends TestCase
     public function testUpdateFail()
     {
         $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-        $this->assertEquals(1, User::count());
+        $this->assertEquals(2, User::count());
 
-        session()->setPreviousUrl('http://localhost/user/1/edit');
-        $response = $this->call('PUT', '/user/1', $this->csrf(['email' => ''] + $user->getAttributes()));
+        session()->setPreviousUrl('http://localhost/auth/user/2/edit');
+        $response = $this->call('PUT', '/auth/user/2', $this->csrf(['email' => ''] + $user->getAttributes()));
 
         $user = $user->fresh();
-        $this->assertEquals(1, User::count());
+        $this->assertEquals(2, User::count());
         $this->assertEquals('a@b.cd', $user->email);
         $this->assertSessionHasErrors();
-        $this->assertRedirectedTo('user/1/edit');
+        $this->assertRedirectedTo('auth/user/2/edit');
     }
 
     /**
@@ -107,12 +116,12 @@ class UserControllerTest extends TestCase
     public function testDestroy()
     {
         FactoryMuffin::create('App\User');
+        $this->assertEquals(2, User::count());
+
+        $response = $this->call('DELETE', '/auth/user/2', $this->csrf());
+
         $this->assertEquals(1, User::count());
-
-        $response = $this->call('DELETE', '/user/1', $this->csrf());
-
-        $this->assertEquals(0, User::count());
-        $this->assertRedirectedTo('users');
+        $this->assertRedirectedTo('auth/users');
     }
 
     /**
@@ -120,7 +129,7 @@ class UserControllerTest extends TestCase
      */
     public function testCreate()
     {
-        $response = $this->call('GET', '/user/create');
+        $response = $this->call('GET', '/auth/user/create');
         $view = $response->original;
 
         $this->assertResponseOk();
@@ -133,10 +142,9 @@ class UserControllerTest extends TestCase
      */
     public function testEdit()
     {
-        FactoryMuffin::create('App\User');
         FactoryMuffin::create('App\Role');
 
-        $response = $this->call('GET', '/user/1/edit');
+        $response = $this->call('GET', '/auth/user/1/edit');
         $view = $response->original;
 
         $this->assertResponseOk();

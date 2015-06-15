@@ -6,13 +6,24 @@ use League\FactoryMuffin\Facade as FactoryMuffin;
 class PostControllerTest extends TestCase
 {
     /**
+     * Run before each test.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $user = FactoryMuffin::create('App\User');
+        $this->be($user);
+    }
+
+    /**
      * Test the index page.
      */
     public function testIndex()
     {
         FactoryMuffin::seed(3, 'App\Post');
 
-        $response = $this->call('GET', '/posts');
+        $response = $this->call('GET', '/auth/posts');
         $view = $response->original;
 
         $this->assertResponseOk();
@@ -28,7 +39,7 @@ class PostControllerTest extends TestCase
     {
         FactoryMuffin::create('App\Post', ['slug' => 'my-post-title']);
 
-        $response = $this->call('GET', '/post/my-post-title');
+        $response = $this->call('GET', '/auth/post/my-post-title');
         $view = $response->original;
 
         $this->assertResponseOk();
@@ -41,18 +52,15 @@ class PostControllerTest extends TestCase
      */
     public function testStoreSuccess()
     {
-        $user = FactoryMuffin::create('App\User');
-        $this->be($user);
-
         $post = FactoryMuffin::instance('App\Post');
         $this->assertEquals(0, Post::count());
         $this->assertNotEquals(1, $post->author_id);
 
-        $response = $this->call('POST', '/posts', $this->csrf($post->getAttributes()));
+        $response = $this->call('POST', '/auth/posts', $this->csrf($post->getAttributes()));
 
         $this->assertEquals(1, Post::count());
         $this->assertEquals(1, Post::find(1)->author_id);
-        $this->assertRedirectedTo('posts');
+        $this->assertRedirectedTo('auth/posts');
     }
 
     /**
@@ -60,18 +68,15 @@ class PostControllerTest extends TestCase
      */
     public function testStoreFail()
     {
-        $user = FactoryMuffin::create('App\User');
-        $this->be($user);
-
         $post = FactoryMuffin::instance('App\Post', ['title' => '']);
         $this->assertEquals(0, Post::count());
 
-        session()->setPreviousUrl('http://localhost/post/create');
-        $response = $this->call('POST', '/posts', $this->csrf($post->getAttributes()));
+        session()->setPreviousUrl('http://localhost/auth/post/create');
+        $response = $this->call('POST', '/auth/posts', $this->csrf($post->getAttributes()));
 
         $this->assertEquals(0, Post::count());
         $this->assertSessionHasErrors();
-        $this->assertRedirectedTo('post/create');
+        $this->assertRedirectedTo('auth/post/create');
     }
 
     /**
@@ -83,12 +88,12 @@ class PostControllerTest extends TestCase
         $this->assertEquals(1, Post::count());
         $this->assertNotEquals('Updated title', $post->title);
 
-        $response = $this->call('PUT', '/post/my-post-title', $this->csrf(['title' => 'Updated title'] + $post->getAttributes()));
+        $response = $this->call('PUT', '/auth/post/my-post-title', $this->csrf(['title' => 'Updated title'] + $post->getAttributes()));
 
         $post = $post->fresh();
         $this->assertEquals(1, Post::count());
         $this->assertEquals('Updated title', $post->title);
-        $this->assertRedirectedTo('posts');
+        $this->assertRedirectedTo('auth/posts');
     }
 
     /**
@@ -99,14 +104,14 @@ class PostControllerTest extends TestCase
         $post = FactoryMuffin::create('App\Post', ['slug' => 'my-post-title', 'title' => 'My post title']);
         $this->assertEquals(1, Post::count());
 
-        session()->setPreviousUrl('http://localhost/post/my-post-title/edit');
-        $response = $this->call('PUT', '/post/my-post-title', $this->csrf(['title' => ''] + $post->getAttributes()));
+        session()->setPreviousUrl('http://localhost/auth/post/my-post-title/edit');
+        $response = $this->call('PUT', '/auth/post/my-post-title', $this->csrf(['title' => ''] + $post->getAttributes()));
 
         $post = $post->fresh();
         $this->assertEquals(1, Post::count());
         $this->assertEquals('My post title', $post->title);
         $this->assertSessionHasErrors();
-        $this->assertRedirectedTo('post/my-post-title/edit');
+        $this->assertRedirectedTo('auth/post/my-post-title/edit');
     }
 
     /**
@@ -117,10 +122,10 @@ class PostControllerTest extends TestCase
         FactoryMuffin::create('App\Post', ['slug' => 'my-post-title']);
         $this->assertEquals(1, Post::count());
 
-        $response = $this->call('DELETE', '/post/my-post-title', $this->csrf());
+        $response = $this->call('DELETE', '/auth/post/my-post-title', $this->csrf());
 
         $this->assertEquals(0, Post::count());
-        $this->assertRedirectedTo('posts');
+        $this->assertRedirectedTo('auth/posts');
     }
 
     /**
@@ -128,7 +133,7 @@ class PostControllerTest extends TestCase
      */
     public function testCreate()
     {
-        $response = $this->call('GET', '/post/create');
+        $response = $this->call('GET', '/auth/post/create');
         $view = $response->original;
 
         $this->assertResponseOk();
@@ -143,7 +148,7 @@ class PostControllerTest extends TestCase
     {
         FactoryMuffin::create('App\Post', ['slug' => 'my-post-title']);
 
-        $response = $this->call('GET', '/post/my-post-title/edit');
+        $response = $this->call('GET', '/auth/post/my-post-title/edit');
         $view = $response->original;
 
         $this->assertResponseOk();
