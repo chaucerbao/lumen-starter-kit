@@ -11,7 +11,7 @@ class Tag extends Model
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['slug', 'name'];
 
     /**
      * Indicates if the model should be timestamped.
@@ -48,7 +48,9 @@ class Tag extends Model
         parent::boot();
 
         static::saving(function ($tag) {
-            $tag->slug = str_slug($tag->name, '-');
+            if (empty($tag->slug)) {
+                $tag->slug = str_slug($tag->name, '-');
+            }
         });
     }
 }

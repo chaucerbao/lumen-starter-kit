@@ -28,11 +28,11 @@ class TagTest extends TestCase
     }
 
     /**
-     * Test that the slug is generated when saved.
+     * Test that the slug is generated if empty when saved.
      */
-    public function testSlugGeneratedWhenSaved()
+    public function testSlugGeneratedIfEmptyWhenSaved()
     {
-        $tag = FactoryMuffin::instance('App\Tag', ['name' => '3 Word TAG']);
+        $tag = FactoryMuffin::instance('App\Tag', ['slug' => '', 'name' => '3 Word TAG']);
 
         $tag->save();
 
