@@ -1,6 +1,7 @@
 <?php
 
-use League\FactoryMuffin\Facade as FactoryMuffin;
+use App\PendingUpdate;
+use App\User;
 
 class AuthControllerTest extends TestCase
 {
@@ -20,7 +21,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreUserSuccess()
     {
-        $user = FactoryMuffin::instance('App\User');
+        $user = factory(User::class)->make();
 
         $response = $this->call('POST', '/register', $this->csrf($user->getAttributes()));
 
@@ -52,8 +53,8 @@ class AuthControllerTest extends TestCase
      */
     public function testEmailConfirmed()
     {
-        $user = FactoryMuffin::create('App\User');
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $user = factory(User::class)->create();
+        $pending = factory(PendingUpdate::class)->make();
         $pending->fill([
             'model' => $user,
             'update' => ['is_confirmed' => true],
@@ -86,7 +87,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreSessionSuccess()
     {
-        FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
+        factory(User::class)->create(['email' => 'a@b.cd', 'password' => 'secret']);
 
         $response = $this->call('POST', '/login', $this->csrf(['email' => 'a@b.cd', 'password' => 'secret']));
 
@@ -98,7 +99,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreSessionRedirectIntended()
     {
-        FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
+        factory(User::class)->create(['email' => 'a@b.cd', 'password' => 'secret']);
 
         session()->flash('url.intended', 'some/url');
         $response = $this->call('POST', '/login', $this->csrf(['email' => 'a@b.cd', 'password' => 'secret']));
@@ -111,7 +112,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreSessionFail()
     {
-        FactoryMuffin::create('App\User', ['email' => 'a@b.cd', 'password' => 'secret']);
+        factory(User::class)->create(['email' => 'a@b.cd', 'password' => 'secret']);
 
         $response = $this->call('POST', '/login', $this->csrf(['email' => 'a@b.cd', 'password' => 'wrongPassword']));
 
@@ -125,7 +126,7 @@ class AuthControllerTest extends TestCase
      */
     public function testDestroySession()
     {
-        $user = FactoryMuffin::create('App\User');
+        $user = factory(User::class)->create();
         $this->be($user);
 
         $this->assertEquals(1, Auth::user()->id);
@@ -153,7 +154,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreRecoveryTokenSuccess()
     {
-        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        factory(User::class)->create(['email' => 'a@b.cd']);
 
         $response = $this->call('POST', '/account/recover', $this->csrf(['email' => 'a@b.cd']));
 
@@ -165,7 +166,7 @@ class AuthControllerTest extends TestCase
      */
     public function testStoreRecoveryTokenFail()
     {
-        FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        factory(User::class)->create(['email' => 'a@b.cd']);
 
         session()->setPreviousUrl('http://localhost/account/recover');
         $response = $this->call('POST', '/account/recover', $this->csrf(['email' => 'w@x.yz']));
@@ -191,9 +192,9 @@ class AuthControllerTest extends TestCase
      */
     public function testUpdatePasswordSuccess()
     {
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending = factory(PendingUpdate::class)->make();
         $pending->fill([
-            'model' => FactoryMuffin::create('App\User', ['email' => 'a@b.cd']),
+            'model' => factory(User::class)->create(['email' => 'a@b.cd']),
             'update' => ['password' => null],
         ]);
         $pending->save();
@@ -211,9 +212,9 @@ class AuthControllerTest extends TestCase
      */
     public function testUpdatePasswordFail()
     {
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending = factory(PendingUpdate::class)->make();
         $pending->fill([
-            'model' => FactoryMuffin::create('App\User', ['email' => 'a@b.cd']),
+            'model' => factory(User::class)->create(['email' => 'a@b.cd']),
             'update' => ['password' => null],
         ]);
         $pending->save();

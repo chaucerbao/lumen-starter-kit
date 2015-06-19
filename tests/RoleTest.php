@@ -1,7 +1,7 @@
 <?php
 
 use App\Role;
-use League\FactoryMuffin\Facade as FactoryMuffin;
+use App\User;
 
 class RoleTest extends TestCase
 {
@@ -18,8 +18,8 @@ class RoleTest extends TestCase
      */
     public function testUsersRelationship()
     {
-        $role = FactoryMuffin::create('App\Role');
-        $user = FactoryMuffin::create('App\User');
+        $role = factory(Role::class)->create();
+        $user = factory(User::class)->create();
 
         $role->users()->attach($user);
 

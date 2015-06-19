@@ -1,7 +1,7 @@
 <?php
 
+use App\Role;
 use App\User;
-use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class UserControllerTest extends TestCase
 {
@@ -12,7 +12,7 @@ class UserControllerTest extends TestCase
     {
         parent::setUp();
 
-        $user = FactoryMuffin::create('App\User');
+        $user = factory(User::class)->create();
         $this->be($user);
     }
 
@@ -21,7 +21,7 @@ class UserControllerTest extends TestCase
      */
     public function testIndex()
     {
-        FactoryMuffin::seed(2, 'App\User');
+        factory(User::class, 2)->create();
 
         $response = $this->call('GET', '/auth/users');
         $view = $response->original;
@@ -50,7 +50,7 @@ class UserControllerTest extends TestCase
      */
     public function testStoreSuccess()
     {
-        $user = FactoryMuffin::instance('App\User');
+        $user = factory(User::class)->make();
         $this->assertEquals(1, User::count());
 
         $response = $this->call('POST', '/auth/users', $this->csrf($user->getAttributes()));
@@ -64,7 +64,7 @@ class UserControllerTest extends TestCase
      */
     public function testStoreFail()
     {
-        $user = FactoryMuffin::instance('App\User', ['email' => '']);
+        $user = factory(User::class)->make(['email' => '']);
         $this->assertEquals(1, User::count());
 
         session()->setPreviousUrl('http://localhost/auth/user/create');
@@ -80,7 +80,7 @@ class UserControllerTest extends TestCase
      */
     public function testUpdateSuccess()
     {
-        $user = FactoryMuffin::create('App\User');
+        $user = factory(User::class)->create();
         $this->assertEquals(2, User::count());
         $this->assertNotEquals('a@b.cd', $user->email);
 
@@ -97,7 +97,7 @@ class UserControllerTest extends TestCase
      */
     public function testUpdateFail()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
+        $user = factory(User::class)->create(['email' => 'a@b.cd']);
         $this->assertEquals(2, User::count());
 
         session()->setPreviousUrl('http://localhost/auth/user/2/edit');
@@ -115,7 +115,7 @@ class UserControllerTest extends TestCase
      */
     public function testDestroy()
     {
-        FactoryMuffin::create('App\User');
+        factory(User::class)->create();
         $this->assertEquals(2, User::count());
 
         $response = $this->call('DELETE', '/auth/user/2', $this->csrf());
@@ -142,7 +142,7 @@ class UserControllerTest extends TestCase
      */
     public function testEdit()
     {
-        FactoryMuffin::create('App\Role');
+        factory(Role::class)->create();
 
         $response = $this->call('GET', '/auth/user/1/edit');
         $view = $response->original;

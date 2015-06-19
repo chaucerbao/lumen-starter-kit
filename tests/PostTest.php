@@ -1,8 +1,9 @@
 <?php
 
 use App\Post;
+use App\Tag;
+use App\User;
 use Carbon\Carbon;
-use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class PostTest extends TestCase
 {
@@ -19,8 +20,8 @@ class PostTest extends TestCase
      */
     public function testAuthorRelationship()
     {
-        $user = FactoryMuffin::create('App\User');
-        $post = FactoryMuffin::create('App\Post');
+        $user = factory(User::class)->create();
+        $post = factory(Post::class)->create();
 
         $post->author()->associate($user);
 
@@ -33,8 +34,8 @@ class PostTest extends TestCase
      */
     public function testTagsRelationship()
     {
-        $post = FactoryMuffin::create('App\Post');
-        $tag = FactoryMuffin::create('App\Tag');
+        $post = factory(Post::class)->create();
+        $tag = factory(Tag::class)->create();
 
         $post->tags()->attach($tag);
 
@@ -49,10 +50,10 @@ class PostTest extends TestCase
     {
         $future = Carbon::now()->addMinute();
         $past = Carbon::now()->subMinute();
-        FactoryMuffin::create('App\Post', ['is_active' => true, 'published_at' => $future]);
-        FactoryMuffin::create('App\Post', ['is_active' => true, 'published_at' => $past]);
-        FactoryMuffin::create('App\Post', ['is_active' => false, 'published_at' => $future]);
-        FactoryMuffin::create('App\Post', ['is_active' => false, 'published_at' => $past]);
+        factory(Post::class)->create(['is_active' => true, 'published_at' => $future]);
+        factory(Post::class)->create(['is_active' => true, 'published_at' => $past]);
+        factory(Post::class)->create(['is_active' => false, 'published_at' => $future]);
+        factory(Post::class)->create(['is_active' => false, 'published_at' => $past]);
 
         $published = Post::published()->get();
 
@@ -69,10 +70,10 @@ class PostTest extends TestCase
     {
         $future = Carbon::now()->addMinute();
         $past = Carbon::now()->subMinute();
-        FactoryMuffin::create('App\Post', ['is_active' => true, 'published_at' => $future]);
-        FactoryMuffin::create('App\Post', ['is_active' => true, 'published_at' => $past]);
-        FactoryMuffin::create('App\Post', ['is_active' => false, 'published_at' => $future]);
-        FactoryMuffin::create('App\Post', ['is_active' => false, 'published_at' => $past]);
+        factory(Post::class)->create(['is_active' => true, 'published_at' => $future]);
+        factory(Post::class)->create(['is_active' => true, 'published_at' => $past]);
+        factory(Post::class)->create(['is_active' => false, 'published_at' => $future]);
+        factory(Post::class)->create(['is_active' => false, 'published_at' => $past]);
 
         $drafts = Post::drafts()->get();
 

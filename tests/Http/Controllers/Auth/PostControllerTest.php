@@ -1,7 +1,7 @@
 <?php
 
 use App\Post;
-use League\FactoryMuffin\Facade as FactoryMuffin;
+use App\User;
 
 class PostControllerTest extends TestCase
 {
@@ -12,7 +12,7 @@ class PostControllerTest extends TestCase
     {
         parent::setUp();
 
-        $user = FactoryMuffin::create('App\User');
+        $user = factory(User::class)->create();
         $this->be($user);
     }
 
@@ -21,7 +21,7 @@ class PostControllerTest extends TestCase
      */
     public function testIndex()
     {
-        FactoryMuffin::seed(3, 'App\Post');
+        factory(Post::class, 3)->create();
 
         $response = $this->call('GET', '/auth/posts');
         $view = $response->original;
@@ -37,7 +37,7 @@ class PostControllerTest extends TestCase
      */
     public function testShow()
     {
-        FactoryMuffin::create('App\Post', ['slug' => 'my-post-title']);
+        factory(Post::class)->create(['slug' => 'my-post-title']);
 
         $response = $this->call('GET', '/auth/post/my-post-title');
         $view = $response->original;
@@ -52,7 +52,7 @@ class PostControllerTest extends TestCase
      */
     public function testStoreSuccess()
     {
-        $post = FactoryMuffin::instance('App\Post');
+        $post = factory(Post::class)->make();
         $this->assertEquals(0, Post::count());
         $this->assertNotEquals(1, $post->author_id);
 
@@ -68,7 +68,7 @@ class PostControllerTest extends TestCase
      */
     public function testStoreFail()
     {
-        $post = FactoryMuffin::instance('App\Post', ['title' => '']);
+        $post = factory(Post::class)->make(['title' => '']);
         $this->assertEquals(0, Post::count());
 
         session()->setPreviousUrl('http://localhost/auth/post/create');
@@ -84,7 +84,7 @@ class PostControllerTest extends TestCase
      */
     public function testUpdateSuccess()
     {
-        $post = FactoryMuffin::create('App\Post', ['slug' => 'my-post-title']);
+        $post = factory(Post::class)->create(['slug' => 'my-post-title']);
         $this->assertEquals(1, Post::count());
         $this->assertNotEquals('Updated title', $post->title);
 
@@ -101,7 +101,7 @@ class PostControllerTest extends TestCase
      */
     public function testUpdateFail()
     {
-        $post = FactoryMuffin::create('App\Post', ['slug' => 'my-post-title', 'title' => 'My post title']);
+        $post = factory(Post::class)->create(['slug' => 'my-post-title', 'title' => 'My post title']);
         $this->assertEquals(1, Post::count());
 
         session()->setPreviousUrl('http://localhost/auth/post/my-post-title/edit');
@@ -119,7 +119,7 @@ class PostControllerTest extends TestCase
      */
     public function testDestroy()
     {
-        FactoryMuffin::create('App\Post', ['slug' => 'my-post-title']);
+        factory(Post::class)->create(['slug' => 'my-post-title']);
         $this->assertEquals(1, Post::count());
 
         $response = $this->call('DELETE', '/auth/post/my-post-title', $this->csrf());
@@ -146,7 +146,7 @@ class PostControllerTest extends TestCase
      */
     public function testEdit()
     {
-        FactoryMuffin::create('App\Post', ['slug' => 'my-post-title']);
+        factory(Post::class)->create(['slug' => 'my-post-title']);
 
         $response = $this->call('GET', '/auth/post/my-post-title/edit');
         $view = $response->original;

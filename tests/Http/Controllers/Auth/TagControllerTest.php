@@ -1,7 +1,7 @@
 <?php
 
 use App\Tag;
-use League\FactoryMuffin\Facade as FactoryMuffin;
+use App\User;
 
 class TagControllerTest extends TestCase
 {
@@ -12,7 +12,7 @@ class TagControllerTest extends TestCase
     {
         parent::setUp();
 
-        $user = FactoryMuffin::create('App\User');
+        $user = factory(User::class)->create();
         $this->be($user);
     }
 
@@ -21,7 +21,7 @@ class TagControllerTest extends TestCase
      */
     public function testIndex()
     {
-        FactoryMuffin::seed(3, 'App\Tag');
+        factory(Tag::class, 3)->create();
 
         $response = $this->call('GET', '/auth/tags');
         $view = $response->original;
@@ -37,7 +37,7 @@ class TagControllerTest extends TestCase
      */
     public function testStoreSuccess()
     {
-        $tag = FactoryMuffin::instance('App\Tag');
+        $tag = factory(Tag::class)->make();
         $this->assertEquals(0, Tag::count());
 
         $response = $this->call('POST', '/auth/tags', $this->csrf($tag->getAttributes()));
@@ -51,7 +51,7 @@ class TagControllerTest extends TestCase
      */
     public function testStoreFail()
     {
-        $tag = FactoryMuffin::instance('App\Tag', ['name' => '']);
+        $tag = factory(Tag::class)->make(['name' => '']);
         $this->assertEquals(0, Tag::count());
 
         session()->setPreviousUrl('http://localhost/auth/tag/create');
@@ -67,7 +67,7 @@ class TagControllerTest extends TestCase
      */
     public function testUpdateSuccess()
     {
-        $tag = FactoryMuffin::create('App\Tag');
+        $tag = factory(Tag::class)->create();
         $this->assertEquals(1, Tag::count());
         $this->assertNotEquals('The 2nd TAG', $tag->name);
 
@@ -84,7 +84,7 @@ class TagControllerTest extends TestCase
      */
     public function testUpdateFail()
     {
-        $tag = FactoryMuffin::create('App\Tag', ['name' => 'The 1 TAG']);
+        $tag = factory(Tag::class)->create(['name' => 'The 1 TAG']);
         $this->assertEquals(1, Tag::count());
 
         session()->setPreviousUrl('http://localhost/auth/tag/1/edit');
@@ -102,7 +102,7 @@ class TagControllerTest extends TestCase
      */
     public function testDestroy()
     {
-        FactoryMuffin::create('App\Tag');
+        factory(Tag::class)->create();
         $this->assertEquals(1, Tag::count());
 
         $response = $this->call('DELETE', '/auth/tag/1', $this->csrf());
@@ -129,7 +129,7 @@ class TagControllerTest extends TestCase
      */
     public function testEdit()
     {
-        FactoryMuffin::create('App\Tag');
+        factory(Tag::class)->create();
 
         $response = $this->call('GET', '/auth/tag/1/edit');
         $view = $response->original;

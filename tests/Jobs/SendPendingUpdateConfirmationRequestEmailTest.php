@@ -1,8 +1,8 @@
 <?php
 
 use App\Jobs\SendPendingUpdateConfirmationRequestEmail;
+use App\User;
 use Illuminate\Support\Facades\Queue;
-use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class SendPendingUpdateConfirmationRequestEmailTest extends TestCase
 {
@@ -11,7 +11,7 @@ class SendPendingUpdateConfirmationRequestEmailTest extends TestCase
      */
     public function testHandle()
     {
-        $user = FactoryMuffin::create('App\User', [
+        $user = factory(User::class)->create([
             'first_name' => 'George',
             'last_name' => 'Washington',
             'email' => 'a@b.cd',

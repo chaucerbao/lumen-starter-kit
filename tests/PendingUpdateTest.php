@@ -1,8 +1,8 @@
 <?php
 
 use App\PendingUpdate;
+use App\User;
 use Carbon\Carbon;
-use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class PendingUpdateTest extends TestCase
 {
@@ -19,9 +19,9 @@ class PendingUpdateTest extends TestCase
      */
     public function testModelDeSerializedOnGetSet()
     {
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending = factory(PendingUpdate::class)->make();
 
-        $pending->model = FactoryMuffin::create('App\User');
+        $pending->model = factory(User::class)->create();
 
         $this->assertEquals('a:2:{i:0;s:8:"App\User";i:1;i:1;}', $pending->getAttributes()['model']);
         $this->assertInstanceOf('App\User', $pending->model);
@@ -33,7 +33,7 @@ class PendingUpdateTest extends TestCase
      */
     public function testUpdateDeSerializedOnGetSet()
     {
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending = factory(PendingUpdate::class)->make();
 
         $pending->update = ['a' => 1, 'b' => 'two'];
 
@@ -46,9 +46,9 @@ class PendingUpdateTest extends TestCase
      */
     public function testTokenAndExpiresGeneratedOnCreate()
     {
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $pending = factory(PendingUpdate::class)->make();
         $pending->fill([
-            'model' => FactoryMuffin::create('App\User'),
+            'model' => factory(User::class)->create(),
             'update' => ['email' => 'w@x.yz'],
         ]);
 
@@ -66,8 +66,8 @@ class PendingUpdateTest extends TestCase
      */
     public function testApplySuccess()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $user = factory(User::class)->create(['email' => 'a@b.cd']);
+        $pending = factory(PendingUpdate::class)->make();
         $pending->fill([
             'model' => $user,
             'update' => ['email' => 'w@x.yz'],
@@ -89,8 +89,8 @@ class PendingUpdateTest extends TestCase
      */
     public function testApplyOverrideSuccess()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $user = factory(User::class)->create(['email' => 'a@b.cd']);
+        $pending = factory(PendingUpdate::class)->make();
         $pending->fill([
             'model' => $user,
             'update' => ['email' => 'w@x.yz'],
@@ -112,8 +112,8 @@ class PendingUpdateTest extends TestCase
      */
     public function testApplyFail()
     {
-        $user = FactoryMuffin::create('App\User', ['email' => 'a@b.cd']);
-        $pending = FactoryMuffin::instance('App\PendingUpdate');
+        $user = factory(User::class)->create(['email' => 'a@b.cd']);
+        $pending = factory(PendingUpdate::class)->make();
         $pending->fill([
             'model' => $user,
             'update' => ['email' => 'w@x.yz'],
