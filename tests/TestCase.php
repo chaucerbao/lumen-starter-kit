@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Artisan;
-use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class TestCase extends Laravel\Lumen\Testing\TestCase
 {
@@ -13,14 +12,6 @@ class TestCase extends Laravel\Lumen\Testing\TestCase
     public function createApplication()
     {
         return require __DIR__.'/../bootstrap/app.php';
-    }
-
-    /**
-     * Run before each test class.
-     */
-    public static function setUpBeforeClass()
-    {
-        FactoryMuffin::loadFactories(__DIR__.'/factories');
     }
 
     /**

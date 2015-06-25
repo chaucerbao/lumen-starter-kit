@@ -2,8 +2,6 @@
 
 use App\Role;
 use App\User;
-use Faker\Factory as Faker;
-use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class UserTest extends TestCase
 {
@@ -20,8 +18,8 @@ class UserTest extends TestCase
      */
     public function testRolesRelationship()
     {
-        $user = FactoryMuffin::create('App\User');
-        $role = FactoryMuffin::create('App\Role');
+        $user = factory(User::class)->create();
+        $role = factory(Role::class)->create();
 
         $user->roles()->attach($role);
 
@@ -34,7 +32,7 @@ class UserTest extends TestCase
      */
     public function testGetFullName()
     {
-        $user = FactoryMuffin::instance('App\User', [
+        $user = factory(User::class)->make([
             'first_name' => 'George',
             'last_name' => 'Washington',
         ]);
@@ -47,7 +45,7 @@ class UserTest extends TestCase
      */
     public function testNewPasswordHashedWhenSaved()
     {
-        $user = FactoryMuffin::instance('App\User', [
+        $user = factory(User::class)->make([
             'email' => 'a@b.cd',
             'password' => 'secret',
         ]);
@@ -63,14 +61,13 @@ class UserTest extends TestCase
      */
     public function testHashedPasswordNotRehashedWhenSaved()
     {
-        $user = FactoryMuffin::create('App\User', [
+        $user = factory(User::class)->create([
             'email' => 'a@b.cd',
             'password' => 'secret',
         ]);
         $hashed_password = $user->password;
 
-        $faker = Faker::create();
-        $user->first_name = $faker->firstName;
+        $user->first_name = 'George';
         $user->save();
 
         $this->assertEquals($hashed_password, $user->password);
@@ -82,7 +79,7 @@ class UserTest extends TestCase
      */
     public function testHashedPasswordNotRehashedWhenEmptyDuringSave()
     {
-        $user = FactoryMuffin::create('App\User', [
+        $user = factory(User::class)->create([
             'email' => 'a@b.cd',
             'password' => 'secret',
         ]);
@@ -100,8 +97,8 @@ class UserTest extends TestCase
      */
     public function testCanBoolean()
     {
-        $user = FactoryMuffin::create('App\User');
-        $role = FactoryMuffin::create('App\Role', ['name' => 'My Role']);
+        $user = factory(User::class)->create();
+        $role = factory(Role::class)->create(['name' => 'My Role']);
         $user->roles()->attach($role);
 
         Role::allow('My Role', 'write', 'Model');
@@ -116,9 +113,9 @@ class UserTest extends TestCase
      */
     public function testCanCallback()
     {
-        $userA = FactoryMuffin::create('App\User');
-        $userB = FactoryMuffin::create('App\User');
-        $role = FactoryMuffin::create('App\Role', ['name' => 'My Role']);
+        $userA = factory(User::class)->create();
+        $userB = factory(User::class)->create();
+        $role = factory(Role::class)->create(['name' => 'My Role']);
         $userA->roles()->attach($role);
 
         Role::allow('My Role', 'write', 'App\User', function ($user, $target) {

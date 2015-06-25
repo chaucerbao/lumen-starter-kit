@@ -82,6 +82,6 @@ class Post extends Model
      */
     public function scopeDrafts(Builder $query)
     {
-        return $query->where('is_active', '');
+        return $query->where('is_active', false);
     }
 }

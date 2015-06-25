@@ -1,7 +1,7 @@
 <?php
 
+use App\Post;
 use App\Tag;
-use League\FactoryMuffin\Facade as FactoryMuffin;
 
 class TagTest extends TestCase
 {
@@ -18,8 +18,8 @@ class TagTest extends TestCase
      */
     public function testPostsRelationship()
     {
-        $tag = FactoryMuffin::create('App\Tag');
-        $post = FactoryMuffin::create('App\Post');
+        $tag = factory(Tag::class)->create();
+        $post = factory(Post::class)->create();
 
         $tag->posts()->attach($post);
 
@@ -32,7 +32,7 @@ class TagTest extends TestCase
      */
     public function testSlugGeneratedIfEmptyWhenSaved()
     {
-        $tag = FactoryMuffin::instance('App\Tag', ['slug' => '', 'name' => '3 Word TAG']);
+        $tag = factory(Tag::class)->make(['slug' => '', 'name' => '3 Word TAG']);
 
         $tag->save();
 

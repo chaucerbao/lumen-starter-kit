@@ -15,3 +15,6 @@ A boilerplate set of features that are boring to implement, yet almost always ne
 
 ### Posts
 - Post management (CRUD)
+
+### Tags
+- Tag management (CRUD)
